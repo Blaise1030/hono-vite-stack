@@ -1,15 +1,11 @@
 // server.ts
 import { Hono } from "hono";
-import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { readFile } from "node:fs/promises";
 import api from "./api";
 
 const isProd = process.env["NODE_ENV"] === "production";
-let html = await readFile(
-  isProd ? "./dist/build/index.html" : "index.html",
-  "utf8"
-);
+let html = await readFile(isProd ? "build/index.html" : "index.html", "utf8");
 
 if (!isProd) {
   // Inject Vite client code to the HTML
@@ -35,14 +31,8 @@ const app = new Hono()
     await next();
   })
   .route("/api", api) // register the API endpoint
-  .use("/assets/*", serveStatic({ root: isProd ? "./dist/build/" : "./" })) // path must end with '/'
+  .use("/assets/*", serveStatic({ root: isProd ? "build/" : "./" })) // path must end with '/'
   .get("/*", (c) => c.html(html));
 
 export default app;
 export type AppType = typeof app;
-
-if (isProd) {
-  serve({ ...app, port: 4000 }, (info) => {
-    console.log(`Listening on http://localhost:${info.port}`);
-  });
-}

@@ -21,6 +21,7 @@ export default function IndexPage() {
 
   return (
     <>
+      Hello
       {todoList.map((todo) => (
         <div key={todo.id}>
           <h1>{todo.title}</h1>
